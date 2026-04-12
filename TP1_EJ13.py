@@ -12,5 +12,5 @@ def validar_patente(patente):
 
     return bool(re.match(patron, patente))
     
-PATENTE=input("ingrese patente: ")
+PATENTE=input("Ingrese patente: ")
 print(validar_patente(PATENTE))

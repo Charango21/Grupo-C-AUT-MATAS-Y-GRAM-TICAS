@@ -8,6 +8,7 @@ import random
 from maquina_turing import normalizar
 from tokenizador import tokenizar
 from clasificador import clasificar, puntuar, evaluar
+from gramatica import clasificar_estructural, reducir_tokens
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 RUTA_DATASET = os.path.join(BASE, "Dataset", "SpamCollectionSpanish.csv")
@@ -71,3 +72,45 @@ if __name__ == "__main__":
 
     mejor = max(resultados, key=lambda r: r["accuracy"])
     print(f"\n-> Mejor umbral: U = {mejor['U']} (accuracy: {mejor['accuracy']:.2%})")
+
+    print()
+    print("=" * 60)
+    print("           ETAPA 4 — VALIDACIÓN ESTRUCTURAL (GLC)")
+    print("=" * 60)
+    print()
+
+    finales = []
+    for i, (etiqueta, mensaje) in enumerate(todos, 1):
+        tokens = todos_los_tokens[i - 1]
+        pred3 = clasificar(tokens, umbral=4)
+        veredicto = clasificar_estructural(tokens, pred3)
+        texto_norm, _ = normalizar(mensaje)
+        reducidos = reducir_tokens(tokens)
+        # secuencia que realmente evalua CYK (sin text lider/trailer)
+        cyk_in = list(reducidos)
+        while cyk_in and cyk_in[0] == "text":
+            cyk_in.pop(0)
+        while cyk_in and cyk_in[-1] == "text":
+            cyk_in.pop()
+        finales.append(veredicto)
+
+        if pred3 == "SPAM":
+            print(f"[{i:3d}] real={etiqueta:4s} | {pred3:4s} -> {veredicto:12s}")
+            print(f"       | {texto_norm[:60]}")
+            print(f"       | reducido: {reducidos}")
+            print(f"       |  -> CYK:  {cyk_in}")
+            print()
+
+    spam_count = finales.count("SPAM")
+    atipico_count = finales.count("SPAM_ATIPICO")
+    ham_count = finales.count("HAM")
+
+    print("-" * 60)
+    print(f"SPAM         : {spam_count:3d} mensajes (estructura canónica)")
+    print(f"SPAM_ATIPICO : {atipico_count:3d} mensajes (estructura no canónica)")
+    print(f"HAM          : {ham_count:3d} mensajes")
+    print(f"Total        : {len(finales):3d} mensajes")
+    print()
+    print("Nota: Los árboles de derivación del informe se construyen")
+    print("sobre mensajes reales que SÍ cumplen la GLC (ej: mensajes")
+    print("con secuencia [caps, text, contact] o [caps, caps, text, contact]).")

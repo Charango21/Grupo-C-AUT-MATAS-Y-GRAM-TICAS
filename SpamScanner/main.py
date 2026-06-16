@@ -29,7 +29,13 @@ def cargar_mensajes(ruta, n_ham=50, n_spam=50, seed=42):
 
 if __name__ == "__main__":
     ham_msgs, spam_msgs = cargar_mensajes(RUTA_DATASET)
-    todos = [("HAM", m) for m in ham_msgs] + [("SPAM", m) for m in spam_msgs]
+    todos = []
+
+    for m in ham_msgs:
+        todos.append(("HAM", m))
+
+    for m in spam_msgs:
+        todos.append(("SPAM", m))
 
     print("=== Etapa 1 + 2 + 3: Normalización, Tokenización y Clasificación ===\n")
     print(f"Total mensajes: {len(todos)} (50 HAM, 50 SPAM)\n")
@@ -39,7 +45,10 @@ if __name__ == "__main__":
     finales = []
     spam_para_mostrar = []
 
-    for i, (etiqueta, mensaje) in enumerate(todos, 1):
+    for i, elemento in enumerate(todos, 1):
+        etiqueta = elemento[0]
+        mensaje = elemento[1]
+        i += 1
         texto_norm, traza = normalizar(mensaje)
         tokens = tokenizar(texto_norm)
         todas_etiquetas.append(etiqueta)
@@ -83,7 +92,11 @@ if __name__ == "__main__":
     print("=" * 60)
     print()
 
-    for i, etiqueta, veredicto, texto_norm in spam_para_mostrar:
+    for elemento in spam_para_mostrar:
+        i = elemento[0]
+        etiqueta = elemento[1]
+        veredicto = elemento[2]
+        texto_norm = elemento[3]
         print(f"[{i:3d}] real={etiqueta:4s} | SPAM -> {veredicto:12s}")
         print(f"       | {texto_norm[:60]}")
         print()

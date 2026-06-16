@@ -6,19 +6,14 @@ usando el algoritmo CYK.
 
 GLC formal:
   G = (V, T, P, S)
-  V = {S, G, C, N}
+  V = {S, G, C, N, U}
   T = {caps, money, text, contact}
   P:
     S → G U
     U → C N
-    G → caps
-    G → G G
-    C → money
-    C → text
-    C → C C
-    N → contact
-    N → N N
-  S = S
+    G → caps | G G
+    C → money | text | C C
+    N → contact | N N
 
 Veredicto final:
   - HAM: ya era HAM en etapa 3

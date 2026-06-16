@@ -33,7 +33,9 @@ def evaluar(tokens_por_msj, etiquetas_reales, valores_u):
     resultados = []
     for u in valores_u:
         tp = fp = tn = fn = 0
-        for tokens, real in zip(tokens_por_msj, etiquetas_reales):
+        for i in range(len(tokens_por_msj)):
+            tokens = tokens_por_msj[i]
+            real = etiquetas_reales[i]
             pred = clasificar(tokens, u)
             if pred == "SPAM" and real == "SPAM":
                 tp += 1
@@ -44,14 +46,23 @@ def evaluar(tokens_por_msj, etiquetas_reales, valores_u):
             elif pred == "HAM" and real == "SPAM":
                 fn += 1
         total = tp + tn + fp + fn
-        accuracy = (tp + tn) / total if total else 0
-        precision = tp / (tp + fp) if (tp + fp) else 0
-        recall = tp / (tp + fn) if (tp + fn) else 0
-        f1 = (
-            2 * precision * recall / (precision + recall)
-            if (precision + recall)
-            else 0
-        )
+        if total != 0:
+            accuracy = (tp + tn) / total
+        else:
+            accuracy = 0
+        if (tp + fp) != 0:
+            precision = tp / (tp + fp)
+        else:
+            precision = 0
+        if (tp + fn) != 0:
+            recall = tp / (tp + fn)
+        else:
+            recall = 0
+            
+        if (precision + recall) != 0:
+            f1 = 2 * precision * recall / (precision + recall)
+        else:
+            f1 = 0
         resultados.append(
             {
                 "U": u,

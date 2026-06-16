@@ -15,11 +15,7 @@ PESOS = {
 
 
 def clasificar(tokens, umbral):
-    suma = 0
-    for t in tokens:
-        peso = PESOS.get(t, 0)
-        suma = suma + peso
-    if suma > umbral:
+    if puntuar(tokens) > umbral:
         return "SPAM"
     else:
         return "HAM"

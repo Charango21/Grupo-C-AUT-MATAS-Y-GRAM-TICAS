@@ -8,7 +8,7 @@ import random
 from maquina_turing import normalizar
 from tokenizador import tokenizar
 from clasificador import clasificar, puntuar, evaluar
-from gramatica import clasificar_estructural, reducir_tokens
+from gramatica import clasificar_estructural
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 RUTA_DATASET = os.path.join(BASE, "Dataset", "SpamCollectionSpanish.csv")
@@ -36,6 +36,8 @@ if __name__ == "__main__":
 
     todas_etiquetas = []
     todos_los_tokens = []
+    finales = []
+    spam_para_mostrar = []
 
     for i, (etiqueta, mensaje) in enumerate(todos, 1):
         texto_norm, traza = normalizar(mensaje)
@@ -51,6 +53,11 @@ if __name__ == "__main__":
         print(f"       | {texto_norm[:70]}")
         print(f"       | tokens: {tokens}")
         print()
+
+        veredicto = clasificar_estructural(tokens, pred)
+        finales.append(veredicto)
+        if pred == "SPAM":
+            spam_para_mostrar.append((i, etiqueta, veredicto, texto_norm))
 
     print("=" * 60)
     print("           EVALUACIÓN — ETAPA 3")
@@ -76,26 +83,10 @@ if __name__ == "__main__":
     print("=" * 60)
     print()
 
-    finales = []
-    for i, (etiqueta, mensaje) in enumerate(todos, 1):
-        tokens = todos_los_tokens[i - 1]
-        pred3 = clasificar(tokens, umbral=4)
-        veredicto = clasificar_estructural(tokens, pred3)
-        texto_norm, _ = normalizar(mensaje)
-        reducidos = reducir_tokens(tokens)
-        cyk_in = list(reducidos)
-        while cyk_in and cyk_in[0] == "text":
-            cyk_in.pop(0)
-        while cyk_in and cyk_in[-1] == "text":
-            cyk_in.pop()
-        finales.append(veredicto)
-
-        if pred3 == "SPAM":
-            print(f"[{i:3d}] real={etiqueta:4s} | {pred3:4s} -> {veredicto:12s}")
-            print(f"       | {texto_norm[:60]}")
-            print(f"       | reducido: {reducidos}")
-            print(f"       |  -> CYK:  {cyk_in}")
-            print()
+    for i, etiqueta, veredicto, texto_norm in spam_para_mostrar:
+        print(f"[{i:3d}] real={etiqueta:4s} | SPAM -> {veredicto:12s}")
+        print(f"       | {texto_norm[:60]}")
+        print()
 
     spam_count = finales.count("SPAM")
     atipico_count = finales.count("SPAM_ATIPICO")

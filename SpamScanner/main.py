@@ -37,7 +37,7 @@ if __name__ == "__main__":
     for m in spam_msgs:
         todos.append(("SPAM", m))
 
-    print("=== Pipeline Completo: Etapas 1 a 4 (MT -> ER -> Clasif -> GLC) ===\n")
+    print("=== Pipeline Completo: Etapas 1 a 4 (MT -> ER -> Heuristica -> GLC) ===\n")
     print(f"Total mensajes: {len(todos)} (50 HAM, 50 SPAM)\n")
 
     todas_etiquetas = []
@@ -45,14 +45,43 @@ if __name__ == "__main__":
     finales = []
     spam_para_mostrar = []
 
+    print("=" * 60)
+    print("           ETAPA 1 — Normalización (Máquina de Turing)")
+    print("=" * 60)
+    print("(Traza detallada solo para los primeros 3 mensajes)\n")
+
     for i, elemento in enumerate(todos, 1):
         etiqueta = elemento[0]
         mensaje = elemento[1]
-        i += 1
+        detallar = i <= 3
+
+        if detallar:
+            print(f"--- Mensaje #{i} ({etiqueta}) ---")
+            print(f"  Original: {mensaje[:80]}")
+
         texto_norm, traza = normalizar(mensaje)
+
+        if detallar:
+            print(f"  Normalizado: {texto_norm[:80]}")
+            print(f"  Traza MT ({len(traza)} pasos):")
+            for t in traza[:15]:
+                print(f"    {t}")
+            if len(traza) > 15:
+                print(f"    ... ({len(traza) - 15} pasos más)")
+            print()
+        else:
+            print(f"[{i:3d}/{len(todos)}] normalizado", end="\r")
+
         tokens = tokenizar(texto_norm)
         todas_etiquetas.append(etiqueta)
         todos_los_tokens.append(tokens)
+
+        if detallar:
+            print("=" * 60)
+            print("           ETAPA 2 — Tokenización (Expresiones Regulares)")
+            print("=" * 60)
+            print(f"  Tokens detectados en mensaje #{i}: {tokens}")
+            print()
 
         pred = clasificar(tokens, umbral=4)
         pj = puntuar(tokens)
@@ -111,6 +140,4 @@ if __name__ == "__main__":
     print(f"HAM          : {ham_count:3d} mensajes")
     print(f"Total        : {len(finales):3d} mensajes")
     print()
-    print("Nota: Los árboles de derivación del informe se construyen")
-    print("sobre mensajes reales que SÍ cumplen la GLC (ej: mensajes")
-    print("con secuencia [caps, text, contact] o [caps, caps, text, contact]).")
+

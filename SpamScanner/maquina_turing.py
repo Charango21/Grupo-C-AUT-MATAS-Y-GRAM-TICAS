@@ -8,7 +8,7 @@ Q = {q₀, qf}
 Σ = {caracteres imprimibles ASCII presentes en mensajes SMS}
 Γ = Σ ∪ {B}
 q₀ = q₀
-B  = B (blank / fin de cinta)
+B  = \0 (null / fin de cinta)
 F  = {qf}
 
 δ: Q × Γ → Q × Γ × {L, R}
@@ -25,7 +25,7 @@ class TuringMachine:
         self.tape = list(tape)
         self.head = 0
         self.state = "q0"
-        self.blank = "B"
+        self.blank = "\0"
         self.trace = []
 
     def step(self):

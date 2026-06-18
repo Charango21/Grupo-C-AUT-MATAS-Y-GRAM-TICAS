@@ -37,7 +37,7 @@ if __name__ == "__main__":
     for m in spam_msgs:
         todos.append(("SPAM", m))
 
-    print("=== Etapa 1 + 2 + 3: Normalización, Tokenización y Clasificación ===\n")
+    print("=== Pipeline Completo: Etapas 1 a 4 (MT -> ER -> Clasif -> GLC) ===\n")
     print(f"Total mensajes: {len(todos)} (50 HAM, 50 SPAM)\n")
 
     todas_etiquetas = []
